@@ -1,0 +1,1 @@
+running itteration  10 ; noise = N1, degree = 0
