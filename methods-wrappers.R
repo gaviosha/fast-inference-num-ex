@@ -81,8 +81,3 @@ Bai_Perron_ints <- function(xx, alpha = 0.1, degree = 0)
   
   return(list(intervals = BP_ints, threshold = NULL))
 }
-
-
-
-
-
