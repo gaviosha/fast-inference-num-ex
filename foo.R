@@ -41,7 +41,7 @@ N1_deg_0 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     out <- numeric(8)
     
     out[1] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = sqrt(nn))$intervals) == 0 
+    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
     
@@ -63,7 +63,7 @@ N1_deg_0 <- apply(N1_deg_0, 1, mean)
 ## degree = 1 
 ##
 
-N1_deg_1 <- foreach(ii=1:KK, .combine = "rbind") %dopar%
+N1_deg_1 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
   {
     progress_file <- file("progress.txt")
     
@@ -74,13 +74,15 @@ N1_deg_1 <- foreach(ii=1:KK, .combine = "rbind") %dopar%
     out <- numeric(8)
     
     out[1] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = sqrt(nn))$intervals) == 0 
+    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
     
     out[4] <- nrow(nsp_poly(xx, alpha = alpha, deg = 1)$intervals) == 0 
     
     out[5] <- 0 # Bain and Perron TO-DO
+    
+    out
   }
 
 N1_deg_1 <- apply(N1_deg_1, 1, mean)
@@ -89,7 +91,7 @@ N1_deg_1 <- apply(N1_deg_1, 1, mean)
 ## degree = 2 
 ##
 
-N1_deg_2 <- foreach(ii=1:KK, .combine = "rbind") %dopar%
+N1_deg_2 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
   {
     progress_file <- file("progress.txt")
     
@@ -100,13 +102,15 @@ N1_deg_2 <- foreach(ii=1:KK, .combine = "rbind") %dopar%
     out <- numeric(8)
     
     out[1] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = sqrt(nn))$intervals) == 0 
+    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
     
     out[4] <- nrow(nsp_poly(xx, alpha = alpha, deg = 2)$intervals) == 0 
     
     out[5] <- 0 # Bain and Perron TO-DO
+    
+    out
   }
 
 N1_deg_2 <- apply(N1_deg_2, 1, mean)
@@ -137,12 +141,12 @@ N2_deg_0 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     
     writeLines(paste("running itteration ",ii, "; noise = N2, degree = 0"),progress_file)
     
-    xx <- sqrt(3/5) * rt(nn)
+    xx <- sqrt(3/5) * rt(nn, df = 5)
     
     out <- numeric(8)
     
     out[1] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = sqrt(nn))$intervals) == 0 
+    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
     
@@ -164,24 +168,26 @@ N2_deg_0 <- apply(N2_deg_0, 1, mean)
 ## degree = 1 
 ##
 
-N2_deg_1 <- foreach(ii=1:KK, .combine = "rbind") %dopar%
+N2_deg_1 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
   {
     progress_file <- file("progress.txt")
     
     writeLines(paste("running itteration ",ii, "; noise = N2, degree = 1"),progress_file)
     
-    xx <- sqrt(3/5) * rt(nn)
+    xx <- sqrt(3/5) * rt(nn, df = 5)
     
     out <- numeric(8)
     
     out[1] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = sqrt(nn))$intervals) == 0 
+    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
     
     out[4] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 1)$intervals) == 0 
     
     out[5] <- 0 # Bain and Perron TO-DO
+    
+    out
   }
 
 N2_deg_1 <- apply(N2_deg_1, 1, mean)
@@ -190,24 +196,26 @@ N2_deg_1 <- apply(N2_deg_1, 1, mean)
 ## degree = 2 
 ##
 
-N2_deg_2 <- foreach(ii=1:KK, .combine = "rbind") %dopar%
+N2_deg_2 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
   {
     progress_file <- file("progress.txt")
     
     writeLines(paste("running itteration ",ii, "; noise = N2, degree = 2"),progress_file)
     
-    xx <- sqrt(3/5) * rt(nn)
+    xx <- sqrt(3/5) * rt(nn, df = 5)
     
     out <- numeric(8)
     
     out[1] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = sqrt(nn))$intervals) == 0 
+    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
     out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
     
     out[4] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 2)$intervals) == 0 
     
     out[5] <- 0 # Bain and Perron TO-DO
+    
+    out
   }
 
 N2_deg_2 <- apply(N2_deg_2, 1, mean)
