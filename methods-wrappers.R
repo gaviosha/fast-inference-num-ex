@@ -76,7 +76,7 @@ Bai_Perron_ints <- function(xx, alpha = 0.1, degree = 0, min_width)
   {
     BP_ints <- matrix(0,0,2)
   } else {
-    BP_ints <- BP_ints$confint[,c(1,3)]
+    BP_ints <- BP_ints$confint[,c(1,3),drop=FALSE] 
   }
   
   return(list(intervals = BP_ints, threshold = NULL))
