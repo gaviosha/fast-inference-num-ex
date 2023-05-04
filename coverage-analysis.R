@@ -27,6 +27,8 @@ KK <- 100 # number of replications
 
 alpha <- 0.1 # desired coverage
 
+min_width <- 20 # minimum segment length
+
 cl <- makeCluster(11)
 
 registerDoParallel(cl)
@@ -50,21 +52,23 @@ N1_deg_0 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
 
     xx <- rnorm(nn)
 
-    out <- numeric(9)
+    out <- numeric(11)
 
     out[1] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0
-    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
 
     out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 0)$intervals) == 0
+    
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 0, min_width = min_width)$intervals) == 0
 
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[9] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
+    out[10] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
 
-    out[7] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = 20)$intervals) == 0
-    out[8] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = 20)$intervals) == 0
-
-    out[9] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
+    out[11] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
 
     out
   }
@@ -83,16 +87,18 @@ N1_deg_1 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
 
     xx <- rnorm(nn)
 
-    out <- numeric(9)
+    out <- numeric(11)
 
     out[1] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0
-    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
 
     out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 1)$intervals) == 0
-
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 1)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 1)$intervals) == 0
+    
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 1, min_width = min_width)$intervals) == 0
 
     out
   }
@@ -114,13 +120,15 @@ N1_deg_2 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     out <- numeric(9)
 
     out[1] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0
-    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
 
     out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 2)$intervals) == 0
-
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 2)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 2)$intervals) == 0
+    
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 2, min_width = min_width)$intervals) == 0
 
     out
   }
@@ -140,9 +148,7 @@ rownames(N1_coverage) <- c(diff_names, "NSP", other_names)
 
 colnames(N1_coverage) <- degrees
 
-N1_coverage[6,] <- "-"
-
-N1_coverage[7:9,2:3] <- "-"
+N1_coverage[9:11,2:3] <- "-"
 
 print(
   xtable(N1_coverage, align = "|l|c|c|c|"),
@@ -168,21 +174,23 @@ N2_deg_0 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
 
     xx <- sqrt(3/5) * rt(nn, df = 5)
 
-    out <- numeric(9)
+    out <- numeric(11)
 
     out[1] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0
-    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
 
-    out[5] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 0)$intervals) == 0
+    
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 0, min_width = min_width)$intervals) == 0
 
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[9] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
+    out[10] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
 
-    out[7] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = 20)$intervals) == 0
-    out[8] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = 20)$intervals) == 0
-
-    out[9] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
+    out[11] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
 
     out
   }
@@ -201,16 +209,18 @@ N2_deg_1 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
 
     xx <- sqrt(3/5) * rt(nn, df = 5)
 
-    out <- numeric(9)
+    out <- numeric(11)
 
     out[1] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0
-    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
 
-    out[5] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 1)$intervals) == 0
-
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 1)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 1)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 1)$intervals) == 0
+    
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 1, min_width = min_width)$intervals) == 0
 
     out
   }
@@ -229,16 +239,18 @@ N2_deg_2 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
 
     xx <- sqrt(3/5) * rt(nn, df = 5)
 
-    out <- numeric(9)
+    out <- numeric(11)
 
     out[1] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0
-    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0
-    out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0
+    out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
 
-    out[5] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 2)$intervals) == 0
-
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 2)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 2)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 2)$intervals) == 0
+    
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 2, min_width = min_width)$intervals) == 0
 
     out
   }
@@ -258,9 +270,7 @@ rownames(N2_coverage) <- c(diff_names, "NSP-SN", other_names)
 
 colnames(N2_coverage) <- degrees
 
-N2_coverage[6,] <- "-"
-
-N2_coverage[7:9,2:3] <- "-"
+N2_coverage[9:11,2:3] <- "-"
 
 print(
   xtable(N2_coverage, align = "|l|c|c|c|"),
@@ -287,21 +297,23 @@ N3_deg_0 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     
     xx <- arima.sim(model = list(ar = 0.5), n = nn)
     
-    out <- numeric(9)
+    out <- numeric(11)
     
     out[1] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
     
-    out[5] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 0)$intervals) == 0 
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 0)$intervals) == 0
     
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 0, min_width = min_width)$intervals) == 0
     
-    out[7] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = 20)$intervals) == 0
-    out[8] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = 20)$intervals) == 0
+    out[9] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
+    out[10] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
     
-    out[9] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
+    out[11] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
     
     out 
   }
@@ -320,16 +332,18 @@ N3_deg_1 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     
     xx <- arima.sim(model = list(ar = 0.5), n = nn)
     
-    out <- numeric(9)
+    out <- numeric(11)
     
     out[1] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 1)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 1)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 1)$intervals) == 0
     
-    out[5] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 1)$intervals) == 0 
-    
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 1, min_width = min_width)$intervals) == 0
     
     out
   }
@@ -348,16 +362,18 @@ N3_deg_2 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     
     xx <- arima.sim(model = list(ar = 0.5), n = nn)
     
-    out <- numeric(9)
+    out <- numeric(11)
     
     out[1] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
     
-    out[5] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 2)$intervals) == 0 
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 2)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 2)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 2)$intervals) == 0
     
-    out[6] <- 0 # Bain and Perron TO-DO
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 2, min_width = min_width)$intervals) == 0
     
     out
   }
@@ -377,9 +393,7 @@ rownames(N3_coverage) <- c(diff_names, "NSP-AR", other_names)
 
 colnames(N3_coverage) <- degrees
 
-N3_coverage[6,] <- "-"
-
-N3_coverage[7:9,2:3] <- "-"
+N3_coverage[9:11,2:3] <- "-"
 
 print(
   xtable(N3_coverage, align = "|l|c|c|c|"), 
@@ -406,22 +420,23 @@ N4_deg_0 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     
     xx <- arima.sim(model = list(ar = 0.5), n = nn, rand.gen = function(n) rt(n, df = 5))
     
-    out <- numeric(10)
+    out <- numeric(11)
     
     out[1] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 0, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[3] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[4] <- nrow(diffInf(xx, degree = 0, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
     
-    out[5] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 0)$intervals) == 0 
-    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 0)$intervals) == 0 
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 0)$intervals) == 0
     
-    out[7] <- 0 # Bain and Perron TO-DO
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 0, min_width = min_width)$intervals) == 0
     
-    out[8] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = 20)$intervals) == 0
-    out[9] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = 20)$intervals) == 0
+    out[9] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
+    out[10] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
     
-    out[10] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
+    out[11] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
     
     out 
   }
@@ -440,17 +455,18 @@ N4_deg_1 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     
     xx <- arima.sim(model = list(ar = 0.5), n = nn, rand.gen = function(n) rt(n, df = 5))
     
-    out <- numeric(10)
+    out <- numeric(11)
     
     out[1] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 1, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[3] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[4] <- nrow(diffInf(xx, degree = 1, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
     
-    out[5] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 1)$intervals) == 0 
-    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 1)$intervals) == 0     
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 1)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 1)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 0)$intervals) == 0
     
-    out[7] <- 0 # Bain and Perron TO-DO
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 1, min_width = min_width)$intervals) == 0
     
     out
   }
@@ -469,17 +485,18 @@ N4_deg_2 <- foreach(ii=1:KK, .combine = "cbind") %dopar%
     
     xx <- arima.sim(model = list(ar = 0.5), n = nn, rand.gen = function(n) rt(n, df = 5))
     
-    out <- numeric(10)
+    out <- numeric(11)
     
     out[1] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0 
-    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = 20)$intervals) == 0 
-    out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = 20)$intervals) == 0
+    out[2] <- nrow(diffInf(xx, degree = 2, noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[3] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0 
+    out[4] <- nrow(diffInf(xx, degree = 2, noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
     
-    out[5] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 2)$intervals) == 0 
-    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 2)$intervals) == 0     
+    out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = 0)$intervals) == 0
+    out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = 0)$intervals) == 0
     
-    out[7] <- 0 # Bain and Perron TO-DO
+    out[8] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = 0, min_width = min_width)$intervals) == 0
     
     out
   }
@@ -499,9 +516,7 @@ rownames(N4_coverage) <- c(diff_names,"NSP-AR" ,"NSP-SN", other_names)
 
 colnames(N4_coverage) <- degrees
 
-N4_coverage[7,] <- "-"
-
-N4_coverage[8:10,2:3] <- "-"
+N4_coverage[9:11,2:3] <- "-"
 
 print(
   xtable(N4_coverage, align = "|l|c|c|c|", digits = c(0,0,0,0)), 

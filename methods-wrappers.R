@@ -57,12 +57,12 @@ smuce_ints <- function(xx, alpha)
 ## BP wrapper 
 ##
 
-Bai_Perron_ints <- function(xx, alpha = 0.1, degree = 0) 
+Bai_Perron_ints <- function(xx, alpha = 0.1, degree = 0, min_width) 
   {
   
-  if (degree == 0) cpt_est <- breakpoints(xx ~ 1, h = degree+2, breaks = NULL)
+  if (degree == 0) cpt_est <- breakpoints(xx ~ 1, h = max(min_width,degree+2), breaks = NULL)
   
-  if (degree > 0) cpt_est <- breakpoints(xx ~ poly(seq_along(xx),degree), h = degree+2, breaks = NULL)
+  if (degree > 0) cpt_est <- breakpoints(xx ~ poly(seq_along(xx),degree), h = max(min_width,degree+2), breaks = NULL)
   
   
   if (is.na(cpt_est$breakpoints[1])) return(list(intervals = matrix(0,0,2), threshold = NULL))
