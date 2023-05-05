@@ -19,6 +19,8 @@ library(stats)
 ## MOSUM wrapper
 ##
 
+
+
 multiscale_mosum_ints <- function(xx, alpha, min_width)
 {
   bandwidths <- bandwidths.default(length(xx))
@@ -81,3 +83,38 @@ Bai_Perron_ints <- function(xx, alpha = 0.1, degree = 0, min_width)
   
   return(list(intervals = BP_ints, threshold = NULL))
 }
+
+
+
+if (file.exists("wiener_holder_sim"))
+{
+
+    load("wiener_holder_sim")
+
+} else {
+  
+  wh <- sim_max_holder(100, 500, .03)
+  
+  save(wh, file = "wiener_holder_sim")
+}
+
+
+nsp_selfnorm_ar <- function(xx, alpha = 0.1, degree = 0, ord = 1, M = 1000)
+{
+  nn <- length(xx)
+
+  x.c <- matrix(0, nn, degree + 1 + ord)
+
+  if (degree > 0) x.c[,2:(degree+1)] <- poly(nn, degree, raw = TRUE)
+
+  for (kk in 1:ord) x.c[(1+kk):nn, degree + 1 + kk] <- xx[1:(nn-kk)]
+
+  x.c <- x.c[(ord+1):nn,]
+
+  xx <- xx[(ord+1):nn]
+
+  thresh.val <- as.numeric(stats::quantile(wh, 1-alpha))
+
+    nsp_selfnorm(y = xx, x = x.c, M = M, lambda = thresh.val)
+}
+
