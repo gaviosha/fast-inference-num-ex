@@ -66,7 +66,7 @@ for (ii in seq_along(noise_types))
         
         writeLines(paste("running itteration ", kk, "; noise =", names(noise_types)[ii], "degree = ", polynomial_degrees[jj]),progress_file)
         
-        xx <- rnorm(nn)
+        xx <- noise_types[[ii]](nn,1)
         
         out <- numeric(12)
         
