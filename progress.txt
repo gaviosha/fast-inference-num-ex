@@ -1,1 +1,1 @@
-running itteration  100 ; noise = N4, degree = 2
+running itteration  100 ; noise = N4 degree =  2
