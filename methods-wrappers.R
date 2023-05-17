@@ -21,9 +21,11 @@ library(stats)
 
 
 
-multiscale_mosum_ints <- function(xx, alpha, min_width)
+multiscale_mosum_ints <- function(xx, alpha = 0.1, min_width = sqrt(length(xx)))
 {
-  bandwidths <- bandwidths.default(length(xx))
+  min_width <- floor(min_width)
+  
+  bandwidths <- bandwidths.default(length(xx), G.min = min_width)
   
   mlp <- multiscale.localPrune(xx, G = bandwidths)
   
@@ -33,8 +35,10 @@ multiscale_mosum_ints <- function(xx, alpha, min_width)
 }
 
 
-uniscale_mosum_ints <- function(xx, alpha, min_width)
+uniscale_mosum_ints <- function(xx, alpha = 0.1, min_width = sqrt(length(xx)))
 {
+  min_width <- floor(min_width)
+  
   mlp <- multiscale.localPrune(xx, G = min_width)
   
   ci <- confint(mlp, level = alpha)
@@ -56,11 +60,29 @@ smuce_ints <- function(xx, alpha)
 }
 
 
+dep_smuce_ints <- function(xx, alpha = 0.1, min_width = sqrt(length(xx)))
+{
+  est_sd <- sdrobnormNonparam(x = xx, param = log(min_width) / log(length(xx)))
+  
+  print(est_sd)
+  
+  dep_smuce_est <- stepFitNonparam(xx, sd = 1, alpha = alpha)
+  # 
+  # dep_smuce_est
+  
+  dep_smuce_ints <- cbind(dep_smuce_est$leftEnd[-1], dep_smuce_est$rightEnd[-length(dep_smuce_est$rightEnd)])
+
+  return(list(intervals = dep_smuce_ints, threshold = NULL))
+}
+
+
 ## BP wrapper 
 ##
 
-Bai_Perron_ints <- function(xx, alpha = 0.1, degree = 0, min_width) 
+Bai_Perron_ints <- function(xx, alpha = 0.1, degree = 0, min_width = sqrt(length(xx))) 
   {
+  
+  min_width <- floor(min_width)
   
   if (degree == 0) cpt_est <- breakpoints(xx ~ 1, h = max(min_width,degree+2), breaks = NULL)
   
@@ -98,6 +120,10 @@ if (file.exists("wiener_holder_sim"))
   save(wh, file = "wiener_holder_sim")
 }
 
+
+
+## NSP wrapper
+##
 
 nsp_selfnorm_ar <- function(xx, alpha = 0.1, degree = 0, ord = 1, M = 1000)
 {
