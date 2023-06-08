@@ -14,7 +14,9 @@ n_scales <- floor(logb(nn/2,aa))
 ## base plot
 ##
 
-plot(NULL, xlim = c(0,nn), ylim = c(0,1), axes = FALSE, ann = FALSE)
+png("plots/sparse-grid.png", width = 600, height = 300)
+
+plot(NULL, xlim = c(1,nn), ylim = c(0,1), axes = FALSE, ann = FALSE)
 
 axis(1)
 
@@ -35,3 +37,5 @@ for (kk in 1:n_scales)
     segments(x0 = ll, x1 = ll+ww, y0 = yy[ll], y1 = yy[ll], lwd = 3)
   }
 }
+
+dev.off()
