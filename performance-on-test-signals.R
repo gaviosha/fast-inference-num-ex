@@ -18,11 +18,9 @@ library(xtable)
 
 set.seed(100)
 
-KK <- 10 # number of replications
+KK <- 500 # number of replications
 
 alpha <- 0.1 # desired coverage
-
-# min_width <- floor(sqrt(nn)) # minimum segment length
 
 
 ## Noise types
@@ -41,7 +39,13 @@ noise_types <- list(
 
 metrics_names <- c("no. genuine", "prop. genuine", "length", "coverage")
 
-methods_names <- c("DIF1-MAD","DIF2-MAD","DIF2-TAVC","NSP","NSP-SN","NSP-AR","NSP-SN-AR","B&P","MOSUM (uniscale)", "MOSUM (multiscale)", "SMUCE")
+methods_names <- c(
+  "DIF1-MAD","DIF2-SD","DIF2-TAVC",
+  "NSP","NSP-SN","NSP-AR",
+  "B&P",
+  "MOSUM (uniscale)","MOSUM (multiscale)", 
+  "SMUCE","H-SMUCE","Dep-SMUCE"
+  )
 
 
 special_pad <- function(str_vec, pad1, pad2)
@@ -109,7 +113,7 @@ unpack <- function(lst)
 ## Do par 
 ##
 
-cl <- makeCluster(10)
+cl <- makeCluster(6)
 
 registerDoParallel(cl)
 
@@ -120,102 +124,109 @@ registerDoParallel(cl)
 # The blocks signal
 #
 #----------------------------
-
-
-print("The blocks signal")
-
-
-## Signal specific params
-##
-
-blocks_signal <- c(rep(0,205),rep(14.64,62),rep(-3.66,41),rep(7.32,164),rep(-7.32,40))
-
-blocks_cpt <- c(205, 267, 308, 472)
-
-blocks_deg <- 0
-
-blocks_sd <- \(ii) ifelse(ii %in% 1:2, 10, 5)
-
-blocks_out <- c()
-
-
-## Simulation
-##
-
-for (ii in seq_along(noise_types))
-{
-  foreach(kk = 1:KK) %dopar%
-    {
-      source("methods-wrappers.R")
-      
-      progress_file <- file("progress.txt")
-      
-      writeLines(paste("running itteration ", kk, "; noise =", names(noise_types)[ii]),progress_file)
-      
-      xx <- blocks_signal + noise_types[[ii]](length(blocks_signal), blocks_sd(ii)) 
-      
-      out <- matrix(0,4,11)
-      
-      diff1_mad <- diffInf(xx, degree = blocks_deg, alpha = alpha)$intervals[,1:2]
-      diff2_mad <- diffInf(xx, degree = blocks_deg, alpha = alpha, noise_type = "non_gaussian_dependent", min_scale = sqrt(length(xx)))$intervals[,1:2]
-      diff2_tavc <- diffInf(xx, degree = blocks_deg, alpha = alpha, noise_type = "non_gaussian_dependent", min_scale = sqrt(length(xx)), dependent_noise = TRUE)$intervals[,1:2]
-      
-      out[,1] <- evaluate_ints(diff1_mad, blocks_cpt)
-      out[,2] <- evaluate_ints(diff2_mad, blocks_cpt)
-      out[,3] <- evaluate_ints(diff2_tavc, blocks_cpt)
-      
-      nsp_ <- nsp_poly(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
-      nsp_sn <- nsp_poly_selfnorm(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
-      nsp_ar <- nsp_poly_ar(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
-      nsp_sn_ar <- nsp_selfnorm_ar(xx, degree = blocks_deg, alpha = alpha)$intervals[,1:2]
-      
-      out[,4] <- evaluate_ints(nsp_, blocks_cpt)
-      out[,5] <- evaluate_ints(nsp_sn, blocks_cpt)
-      out[,6] <- evaluate_ints(nsp_ar, blocks_cpt)
-      out[,7] <- evaluate_ints(nsp_sn_ar, blocks_cpt)
-      
-      bp <- Bai_Perron_ints(xx, alpha = alpha, degree = blocks_deg, min_width = floor(sqrt(length(xx))))$intervals[,1:2]
-      out[,8] <- evaluate_ints(bp, blocks_cpt)
-      
-      mosum_uni <- uniscale_mosum_ints(xx, alpha = alpha, min_width = sqrt(length(xx)))$intervals[,1:2]
-      mosum_multi <- multiscale_mosum_ints(xx, alpha = alpha, min_width = sqrt(length(xx)))$intervals[,1:2]
-      
-      out[,9] <- evaluate_ints(mosum_uni, blocks_cpt)
-      out[,10] <- evaluate_ints(mosum_multi, blocks_cpt)
-      
-      smuce <- smuce_ints(xx, alpha = alpha)$intervals[,1:2]
-      out[,11] <- evaluate_ints(smuce, blocks_cpt)
-      
-      out
-      
-    } -> out
-  
-  blocks_out<- cbind(blocks_out, unpack(out))
-}
-
-
-## Save outputs
-##
-
-blocks_out <- data.frame(blocks_out)
-
-save(blocks_out, file = "RData/blocks-performance")
-
-blocks_out <- cbind(
-  special_pad(methods_names,1,2), 
-  rep(metrics_names, 11), 
-  blocks_out
-) 
-
-colnames(blocks_out) <- c(rep("",2),names(noise_types))
-
-print(
-  xtable(blocks_out, align = "|l|c|c|c|c|c|c|"),
-  file = "tables/blocks-performance.tex",
-  floating = FALSE, 
-  include.rownames = FALSE
-)
-
+# 
+# 
+# print("The blocks signal")
+# 
+# 
+# ## Signal specific params
+# ##
+# 
+# blocks_signal <- c(rep(0,205),rep(14.64,62),rep(-3.66,41),rep(7.32,164),rep(-7.32,40))
+# 
+# blocks_cpt <- c(205, 267, 308, 472)
+# 
+# nn <- length(blocks_signal)
+# 
+# min_width <- floor(sqrt(nn))
+# 
+# blocks_deg <- 0
+# 
+# blocks_sd <- \(ii) ifelse(ii %in% 1:2, 10, 5)
+# 
+# blocks_out <- c()
+# 
+# 
+# ## Simulation
+# ##
+# 
+# for (ii in seq_along(noise_types))
+# {
+#   foreach(kk = 1:KK) %dopar%
+#     {
+#       source("methods-wrappers.R")
+#       
+#       progress_file <- file("progress.txt")
+#       
+#       writeLines(paste("running itteration ", kk, "; noise =", names(noise_types)[ii]),progress_file)
+#       
+#       xx <- blocks_signal + noise_types[[ii]](length(blocks_signal), blocks_sd(ii)) 
+#       
+#       out <- matrix(0,4,12)
+#       
+#       diff1_mad <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = TRUE, independent_noise = TRUE)$intervals[,1:2]
+#       diff2_sd <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = TRUE, min_scale = min_width)$intervals[,1:2]
+#       diff2_tavc <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = FALSE, min_scale = min_width)$intervals[,1:2]
+#       
+#       out[,1] <- evaluate_ints(diff1_mad, blocks_cpt)
+#       out[,2] <- evaluate_ints(diff2_sd, blocks_cpt)
+#       out[,3] <- evaluate_ints(diff2_tavc, blocks_cpt)
+#       
+#       nsp_ <- nsp_poly(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
+#       nsp_sn <- nsp_poly_selfnorm(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
+#       nsp_ar <- nsp_poly_ar(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
+# 
+#       out[,4] <- evaluate_ints(nsp_, blocks_cpt)
+#       out[,5] <- evaluate_ints(nsp_sn, blocks_cpt)
+#       out[,6] <- evaluate_ints(nsp_ar, blocks_cpt)
+# 
+#       bp <- Bai_Perron_ints(xx, alpha = alpha, degree = blocks_deg, min_width = min_width)$intervals[,1:2]
+#       out[,7] <- evaluate_ints(bp, blocks_cpt)
+#       
+#       mosum_uni <- uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals[,1:2]
+#       mosum_multi <- multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals[,1:2]
+#       
+#       out[,8] <- evaluate_ints(mosum_uni, blocks_cpt)
+#       out[,9] <- evaluate_ints(mosum_multi, blocks_cpt)
+#       
+#       smuce <- smuce_ints(xx, alpha = alpha)$intervals[,1:2]
+#       dep_smuce <- dep_smuce_ints(xx, alpha = alpha)$intervals[,1:2]
+#       h_smuce <- h_smuce_ints(xx, alpha = alpha)$intervals[,1:2]
+#       
+#       out[,10] <- evaluate_ints(smuce, blocks_cpt)
+#       out[,11] <- evaluate_ints(dep_smuce, blocks_cpt)
+#       out[,12] <- evaluate_ints(h_smuce, blocks_cpt)
+#       
+#       out
+#       
+#     } -> out
+#   
+#   blocks_out<- cbind(blocks_out, unpack(out))
+# }
+# 
+# 
+# ## Save outputs
+# ##
+# 
+# blocks_out <- data.frame(blocks_out)
+# 
+# save(blocks_out, file = "RData/blocks-performance")
+# 
+# blocks_out <- cbind(
+#   special_pad(methods_names,1,2), 
+#   rep(metrics_names, 12), 
+#   blocks_out
+# ) 
+# 
+# colnames(blocks_out) <- c(rep("",2),names(noise_types))
+# 
+# print(
+#   xtable(blocks_out, align = "|l|c|c|c|c|c|c|"),
+#   file = "tables/blocks-performance.tex",
+#   floating = FALSE, 
+#   include.rownames = FALSE
+# )
+# 
 
 
 #---------------------
@@ -234,6 +245,10 @@ print("The waves signal")
 waves_signal <- c((1:150) * (2**-3), (150:1) * (2**-3), (1:150) * (2**-3), (150:1) * (2**-3))
 
 waves_cpt <- c(150,300,450)
+
+nn <- length(waves_signal)
+
+min_width <- floor(sqrt(nn))
 
 waves_deg <- 1
 
@@ -257,26 +272,24 @@ for (ii in seq_along(noise_types))
       
       xx <- waves_signal + noise_types[[ii]](length(waves_signal), waves_sd) 
       
-      out <- matrix(0,4,7)
+      out <- matrix(0,4,6)
       
-      diff1_mad <- diffInf(xx, degree = waves_deg, alpha = alpha)$intervals[,1:2]
-      diff2_mad <- diffInf(xx, degree = waves_deg, alpha = alpha, noise_type = "non_gaussian_dependent", min_scale = sqrt(length(xx)))$intervals[,1:2]
-      diff2_tavc <- diffInf(xx, degree = waves_deg, alpha = alpha, noise_type = "non_gaussian_dependent", min_scale = sqrt(length(xx)), dependent_noise = TRUE)$intervals[,1:2]
+      diff1_mad <- diffInf(xx, degree = waves_deg, alpha = alpha, gaussian_noise = TRUE, independent_noise = TRUE)$intervals[,1:2]
+      diff2_sd <- diffInf(xx, degree = waves_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = TRUE, min_scale = min_width)$intervals[,1:2]
+      diff2_tavc <- diffInf(xx, degree = waves_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = FALSE, min_scale = min_width)$intervals[,1:2]
       
       out[,1] <- evaluate_ints(diff1_mad, waves_cpt)
-      out[,2] <- evaluate_ints(diff2_mad, waves_cpt)
+      out[,2] <- evaluate_ints(diff2_sd, waves_cpt)
       out[,3] <- evaluate_ints(diff2_tavc, waves_cpt)
       
       nsp_ <- nsp_poly(xx, deg = waves_deg, alpha = alpha)$intervals[,1:2]
       nsp_sn <- nsp_poly_selfnorm(xx, deg = waves_deg, alpha = alpha)$intervals[,1:2]
       nsp_ar <- nsp_poly_ar(xx, deg = waves_deg, alpha = alpha)$intervals[,1:2]
-      nsp_sn_ar <- nsp_selfnorm_ar(xx, degree = waves_deg, alpha = alpha)$intervals[,1:2]
 
       out[,4] <- evaluate_ints(nsp_, waves_cpt)
       out[,5] <- evaluate_ints(nsp_sn, waves_cpt)
       out[,6] <- evaluate_ints(nsp_ar, waves_cpt)
-      out[,7] <- evaluate_ints(nsp_sn_ar, waves_cpt)
-      
+
       out
       
     } -> out
@@ -293,8 +306,8 @@ waves_out <- data.frame(waves_out)
 save(waves_out, file = "RData/waves-performance")
 
 waves_out <- cbind(
-  special_pad(methods_names[1:7],1,2), 
-  rep(metrics_names, 7), 
+  special_pad(methods_names[1:6],1,2), 
+  rep(metrics_names, 6), 
   waves_out
   ) 
 
@@ -325,6 +338,10 @@ hills_signal <- 10 * rep((1:100/100) * (1 - (1:100/100)), 4)
 
 hills_cpt <- c(100,200,300)
 
+nn <- length(hills_signal)
+
+min_width <- floor(sqrt(nn))
+
 hills_deg <- 2
 
 hills_sd <- 1
@@ -347,26 +364,24 @@ for (ii in seq_along(noise_types))
       
       xx <- hills_signal + noise_types[[ii]](length(hills_signal), hills_sd) 
       
-      out <- matrix(0,4,7)
+      out <- matrix(0,4,6)
       
-      diff1_mad <- diffInf(xx, degree = hills_deg, alpha = alpha)$intervals[,1:2]
-      diff2_mad <- diffInf(xx, degree = hills_deg, alpha = alpha, noise_type = "non_gaussian_dependent", min_scale = sqrt(length(xx)))$intervals[,1:2]
-      diff2_tavc <- diffInf(xx, degree = hills_deg, alpha = alpha, noise_type = "non_gaussian_dependent", min_scale = sqrt(length(xx)), dependent_noise = TRUE)$intervals[,1:2]
+      diff1_mad <- diffInf(xx, degree = hills_deg, alpha = alpha, gaussian_noise = TRUE, independent_noise = TRUE)$intervals[,1:2]
+      diff2_sd <- diffInf(xx, degree = hills_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = TRUE, min_scale = min_width)$intervals[,1:2]
+      diff2_tavc <- diffInf(xx, degree = hills_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = FALSE, min_scale = min_width)$intervals[,1:2]
       
       out[,1] <- evaluate_ints(diff1_mad, hills_cpt)
-      out[,2] <- evaluate_ints(diff2_mad, hills_cpt)
+      out[,2] <- evaluate_ints(diff2_sd, hills_cpt)
       out[,3] <- evaluate_ints(diff2_tavc, hills_cpt)
       
       nsp_ <- nsp_poly(xx, deg = hills_deg, alpha = alpha)$intervals[,1:2]
       nsp_sn <- nsp_poly_selfnorm(xx, deg = hills_deg, alpha = alpha)$intervals[,1:2]
       nsp_ar <- nsp_poly_ar(xx, deg = hills_deg, alpha = alpha)$intervals[,1:2]
-      nsp_sn_ar <- nsp_selfnorm_ar(xx, degree = hills_deg, alpha = alpha)$intervals[,1:2]
-      
+
       out[,4] <- evaluate_ints(nsp_, hills_cpt)
       out[,5] <- evaluate_ints(nsp_sn, hills_cpt)
       out[,6] <- evaluate_ints(nsp_ar, hills_cpt)
-      out[,7] <- evaluate_ints(nsp_sn_ar, hills_cpt)
-      
+
       out
       
     } -> out
@@ -383,8 +398,8 @@ hills_out <- data.frame(hills_out)
 save(hills_out, file = "RData/hills-performance")
 
 hills_out <- cbind(
-  special_pad(methods_names[1:7],1,2), 
-  rep(metrics_names, 7), 
+  special_pad(methods_names[1:6],1,2), 
+  rep(metrics_names, 6), 
   hills_out
 ) 
 

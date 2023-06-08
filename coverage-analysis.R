@@ -1,14 +1,11 @@
 
-## 
-##
-
 library(doParallel)
 
 library(foreach)
 
 library(xtable)
 
-methods_names <- c("DIF1-MAD","DIF1-TAVC","DIF2-MAD","DIF2-TAVC","NSP","NSP-SN","NSP-AR","NSP-SN-AR","B&P","MOSUM (uniscale)", "MOSUM (multiscale)", "SMUCE")
+methods_names <- c("DIF1-MAD","DIF2-SD","DIF2-TAVC","NSP","NSP-SN","NSP-AR","B&P","MOSUM (uniscale)", "MOSUM (multiscale)", "SMUCE", "H-SMUCE", "Dep-SMUCE")
 
 degrees_names <- c("degree 0", "degree 1", "degree 2")
 
@@ -19,11 +16,11 @@ degrees_names <- c("degree 0", "degree 1", "degree 2")
 #
 #------------------------
 
-set.seed(100)
+set.seed(42)
 
 nn <- 750 # signal length 
 
-KK <- 100 # number of replications
+KK <- 500 # number of replications
 
 alpha <- 0.1 # desired coverage
 
@@ -32,13 +29,13 @@ min_width <- floor(sqrt(nn)) # minimum segment length
 polynomial_degrees <- 0:2
 
 noise_types <- list(
-  N1 = function(nn, sd) rnorm(nn, sd = sd), 
-  N2 = function(nn, sd) sd * sqrt(3/5) * rt(nn, df = 5), 
-  N3 = function(nn, sd) arima.sim(model = list(ar = 0.5), n = nn, sd = sd / sqrt(1-0.5**2)), 
-  N4 = function(nn, sd) arima.sim(model = list(ar = 0.5), n = nn, rand.gen = function(n) sd * sqrt(3/5) * rt(n, df = 5))  
+  # N1 = function(nn, sd) rnorm(nn, sd = sd),
+  N2 = function(nn, sd) sd * sqrt(3/5) * rt(nn, df = 5),
+  N3 = function(nn, sd) arima.sim(model = list(ar = 0.5), n = nn, sd = sd / sqrt(1-0.5**2)),
+  N4 = function(nn, sd) arima.sim(model = list(ar = 0.5), n = nn, rand.gen = function(n) sd * sqrt(3/5) * rt(n, df = 5))
 )
 
-cl <- makeCluster(11)
+cl <- makeCluster(10)
 
 registerDoParallel(cl)
 
@@ -46,7 +43,7 @@ registerDoParallel(cl)
 
 #--------------
 #
-# Run
+# Run 
 #
 #--------------
 
@@ -70,23 +67,24 @@ for (ii in seq_along(noise_types))
         
         out <- numeric(12)
         
-        out[1] <- nrow(diffInf(xx, degree = polynomial_degrees[jj], noise_type = "gaussian", dependent_noise = FALSE, alpha = alpha)$intervals) == 0
-        out[2] <- nrow(diffInf(xx, degree = polynomial_degrees[jj], noise_type = "gaussian", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
-        out[3] <- nrow(diffInf(xx, degree = polynomial_degrees[jj], noise_type = "non_gaussian_dependent", dependent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0
-        out[4] <- nrow(diffInf(xx, degree = polynomial_degrees[jj], noise_type = "non_gaussian_dependent", dependent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
-        
-        out[5] <- nrow(nsp_poly(xx, alpha = alpha, deg = polynomial_degrees[jj])$intervals) == 0
-        out[6] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = polynomial_degrees[jj])$intervals) == 0
-        out[7] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = polynomial_degrees[jj])$intervals) == 0
-        out[8] <- nrow(nsp_selfnorm_ar(xx, alpha = alpha, degree = polynomial_degrees[jj])$intervals) == 0
-        
-        out[9] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = polynomial_degrees[jj], min_width = min_width)$intervals) == 0
-        
+        out[1] <- nrow(diffInf(xx, degree = polynomial_degrees[jj], gaussian_noise = TRUE, independent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+        out[2] <- nrow(diffInf(xx, degree = polynomial_degrees[jj], gaussian_noise = FALSE, independent_noise = TRUE, alpha = alpha, min_scale = min_width)$intervals) == 0
+        out[3] <- nrow(diffInf(xx, degree = polynomial_degrees[jj], gaussian_noise = FALSE, independent_noise = FALSE, alpha = alpha, min_scale = min_width)$intervals) == 0
+
+        out[4] <- nrow(nsp_poly(xx, alpha = alpha, deg = polynomial_degrees[jj])$intervals) == 0
+        out[5] <- nrow(nsp_poly_selfnorm(xx, alpha = alpha, deg = polynomial_degrees[jj])$intervals) == 0
+        out[6] <- nrow(nsp_poly_ar(xx, alpha = alpha, deg = polynomial_degrees[jj])$intervals) == 0
+
         if (polynomial_degrees[jj] == 0)
         {
-          out[10] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
-          out[11] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
-          out[12] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
+          out[7] <- nrow(Bai_Perron_ints(xx, alpha = alpha, degree = polynomial_degrees[jj], min_width = min_width)$intervals) == 0
+
+          out[8] <- nrow(uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
+          out[9] <- nrow(multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals) == 0
+
+          out[10] <- nrow(smuce_ints(xx, alpha = alpha)$intervals) == 0
+          out[11] <- nrow(h_smuce_ints(xx, alpha)$intervals) == 0
+          out[12] <- nrow(dep_smuce_ints(xx, alpha)$intervals) == 0
         }
         
         out
@@ -104,7 +102,7 @@ for (ii in seq_along(noise_types))
   
   colnames(N_coverage) <- degrees_names
   
-  N_coverage[10:12,2:3] <- "-"
+  N_coverage[8:12,2:3] <- "-"
   
   print(
     xtable(N_coverage, align = "|l|c|c|c|"),

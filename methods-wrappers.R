@@ -13,12 +13,13 @@ library(strucchange)
 
 library(ChangePointInference)
 
+library(StepRNonparam)
+
 library(stats)
 
 
 ## MOSUM wrapper
 ##
-
 
 
 multiscale_mosum_ints <- function(xx, alpha = 0.1, min_width = sqrt(length(xx)))
@@ -59,20 +60,25 @@ smuce_ints <- function(xx, alpha)
   return(list(intervals = smuce_ints, threshold = NULL))
 }
 
+h_smuce_ints <- function(xx, alpha)
+{
+  smuce_fit <- stepFit(xx, family = "hsmuce", confband = TRUE, alpha = alpha)
+  
+  smuce_ints <- jumpint(smuce_fit)[-1,1:2]
+  
+  return(list(intervals = smuce_ints, threshold = NULL))
+}
 
-dep_smuce_ints <- function(xx, alpha = 0.1, min_width = sqrt(length(xx)))
+
+dep_smuce_ints <- function(xx, alpha = 0.1, min_width = (length(xx))^(1/3))
 {
   est_sd <- sdrobnormNonparam(x = xx, param = log(min_width) / log(length(xx)))
   
-  print(est_sd)
+  smuce_fit <- smuceR(xx, family = "gauss", confband = TRUE, alpha = alpha, param = est_sd, lengths = floor(min_width):length(xx))
   
-  dep_smuce_est <- stepFitNonparam(xx, sd = 1, alpha = alpha)
-  # 
-  # dep_smuce_est
+  smuce_ints <- jumpint(smuce_fit)[-1,1:2]
   
-  dep_smuce_ints <- cbind(dep_smuce_est$leftEnd[-1], dep_smuce_est$rightEnd[-length(dep_smuce_est$rightEnd)])
-
-  return(list(intervals = dep_smuce_ints, threshold = NULL))
+  return(list(intervals = smuce_ints, threshold = NULL))
 }
 
 
@@ -104,43 +110,5 @@ Bai_Perron_ints <- function(xx, alpha = 0.1, degree = 0, min_width = sqrt(length
   }
   
   return(list(intervals = BP_ints, threshold = NULL))
-}
-
-
-
-if (file.exists("wiener_holder_sim"))
-{
-
-    load("wiener_holder_sim")
-
-} else {
-  
-  wh <- sim_max_holder(100, 500, .03)
-  
-  save(wh, file = "wiener_holder_sim")
-}
-
-
-
-## NSP wrapper
-##
-
-nsp_selfnorm_ar <- function(xx, alpha = 0.1, degree = 0, ord = 1, M = 1000)
-{
-  nn <- length(xx)
-
-  x.c <- matrix(0, nn, degree + 1 + ord)
-
-  if (degree > 0) x.c[,2:(degree+1)] <- poly(nn, degree, raw = TRUE)
-
-  for (kk in 1:ord) x.c[(1+kk):nn, degree + 1 + kk] <- xx[1:(nn-kk)]
-
-  x.c <- x.c[(ord+1):nn,]
-
-  xx <- xx[(ord+1):nn]
-
-  thresh.val <- as.numeric(stats::quantile(wh, 1-alpha))
-
-    nsp_selfnorm(y = xx, x = x.c, M = M, lambda = thresh.val)
 }
 
