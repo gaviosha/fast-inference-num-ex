@@ -1,1 +1,0 @@
-running itteration  131 ; noise = N3 ; sample size =  500 ; poly deg =  2

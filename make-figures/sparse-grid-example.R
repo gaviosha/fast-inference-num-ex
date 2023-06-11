@@ -2,7 +2,7 @@
 ## params
 ##
 
-nn <- 10
+nn <- 13
 
 aa <- sqrt(2)
 
@@ -16,7 +16,7 @@ n_scales <- floor(logb(nn/2,aa))
 
 png("plots/sparse-grid.png", width = 600, height = 300)
 
-plot(NULL, xlim = c(1,nn), ylim = c(0,1), axes = FALSE, ann = FALSE)
+plot(NULL, xlim = c(0,nn+1), ylim = c(0,1), axes = FALSE, ann = FALSE)
 
 axis(1)
 
