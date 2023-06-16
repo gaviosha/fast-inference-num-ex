@@ -14,7 +14,7 @@ n_scales <- floor(logb(nn/2,aa))
 ## base plot
 ##
 
-png("plots/sparse-grid.png", width = 600, height = 300)
+png("../plots/sparse-grid.png", width = 600, height = 300)
 
 plot(NULL, xlim = c(0,nn+1), ylim = c(0,1), axes = FALSE, ann = FALSE)
 

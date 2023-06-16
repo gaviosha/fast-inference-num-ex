@@ -119,114 +119,114 @@ registerDoParallel(cl)
 
 
 
-#----------------------------
-#
+# ----------------------------
+# 
 # The blocks signal
-#
-#----------------------------
 # 
-# 
-# print("The blocks signal")
-# 
-# 
-# ## Signal specific params
-# ##
-# 
-# blocks_signal <- c(rep(0,205),rep(14.64,62),rep(-3.66,41),rep(7.32,164),rep(-7.32,40))
-# 
-# blocks_cpt <- c(205, 267, 308, 472)
-# 
-# nn <- length(blocks_signal)
-# 
-# min_width <- floor(sqrt(nn))
-# 
-# blocks_deg <- 0
-# 
-# blocks_sd <- \(ii) ifelse(ii %in% 1:2, 10, 5)
-# 
-# blocks_out <- c()
-# 
-# 
-# ## Simulation
-# ##
-# 
-# for (ii in seq_along(noise_types))
-# {
-#   foreach(kk = 1:KK) %dopar%
-#     {
-#       source("methods-wrappers.R")
-#       
-#       progress_file <- file("progress.txt")
-#       
-#       writeLines(paste("running itteration ", kk, "; noise =", names(noise_types)[ii]),progress_file)
-#       
-#       xx <- blocks_signal + noise_types[[ii]](length(blocks_signal), blocks_sd(ii)) 
-#       
-#       out <- matrix(0,4,12)
-#       
-#       diff1_mad <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = TRUE, independent_noise = TRUE)$intervals[,1:2]
-#       diff2_sd <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = TRUE, min_scale = min_width)$intervals[,1:2]
-#       diff2_tavc <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = FALSE, min_scale = min_width)$intervals[,1:2]
-#       
-#       out[,1] <- evaluate_ints(diff1_mad, blocks_cpt)
-#       out[,2] <- evaluate_ints(diff2_sd, blocks_cpt)
-#       out[,3] <- evaluate_ints(diff2_tavc, blocks_cpt)
-#       
-#       nsp_ <- nsp_poly(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
-#       nsp_sn <- nsp_poly_selfnorm(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
-#       nsp_ar <- nsp_poly_ar(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
-# 
-#       out[,4] <- evaluate_ints(nsp_, blocks_cpt)
-#       out[,5] <- evaluate_ints(nsp_sn, blocks_cpt)
-#       out[,6] <- evaluate_ints(nsp_ar, blocks_cpt)
-# 
-#       bp <- Bai_Perron_ints(xx, alpha = alpha, degree = blocks_deg, min_width = min_width)$intervals[,1:2]
-#       out[,7] <- evaluate_ints(bp, blocks_cpt)
-#       
-#       mosum_uni <- uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals[,1:2]
-#       mosum_multi <- multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals[,1:2]
-#       
-#       out[,8] <- evaluate_ints(mosum_uni, blocks_cpt)
-#       out[,9] <- evaluate_ints(mosum_multi, blocks_cpt)
-#       
-#       smuce <- smuce_ints(xx, alpha = alpha)$intervals[,1:2]
-#       dep_smuce <- dep_smuce_ints(xx, alpha = alpha)$intervals[,1:2]
-#       h_smuce <- h_smuce_ints(xx, alpha = alpha)$intervals[,1:2]
-#       
-#       out[,10] <- evaluate_ints(smuce, blocks_cpt)
-#       out[,11] <- evaluate_ints(dep_smuce, blocks_cpt)
-#       out[,12] <- evaluate_ints(h_smuce, blocks_cpt)
-#       
-#       out
-#       
-#     } -> out
-#   
-#   blocks_out<- cbind(blocks_out, unpack(out))
-# }
-# 
-# 
-# ## Save outputs
-# ##
-# 
-# blocks_out <- data.frame(blocks_out)
-# 
-# save(blocks_out, file = "RData/blocks-performance")
-# 
-# blocks_out <- cbind(
-#   special_pad(methods_names,1,2), 
-#   rep(metrics_names, 12), 
-#   blocks_out
-# ) 
-# 
-# colnames(blocks_out) <- c(rep("",2),names(noise_types))
-# 
-# print(
-#   xtable(blocks_out, align = "|l|c|c|c|c|c|c|"),
-#   file = "tables/blocks-performance.tex",
-#   floating = FALSE, 
-#   include.rownames = FALSE
-# )
-# 
+# ----------------------------
+
+
+print("The blocks signal")
+
+
+## Signal specific params
+##
+
+blocks_signal <- c(rep(0,205),rep(14.64,62),rep(-3.66,41),rep(7.32,164),rep(-7.32,40))
+
+blocks_cpt <- c(205, 267, 308, 472)
+
+nn <- length(blocks_signal)
+
+min_width <- floor(sqrt(nn))
+
+blocks_deg <- 0
+
+blocks_sd <- \(ii) ifelse(ii %in% 1:2, 10, 5)
+
+blocks_out <- c()
+
+
+## Simulation
+##
+
+for (ii in seq_along(noise_types))
+{
+  foreach(kk = 1:KK) %dopar%
+    {
+      source("methods-wrappers.R")
+
+      progress_file <- file("progress.txt")
+
+      writeLines(paste("running itteration ", kk, "; noise =", names(noise_types)[ii]),progress_file)
+
+      xx <- blocks_signal + noise_types[[ii]](length(blocks_signal), blocks_sd(ii))
+
+      out <- matrix(0,4,12)
+
+      diff1_mad <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = TRUE, independent_noise = TRUE)$intervals[,1:2]
+      diff2_sd <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = TRUE, min_scale = min_width)$intervals[,1:2]
+      diff2_tavc <- diffInf(xx, degree = blocks_deg, alpha = alpha, gaussian_noise = FALSE, independent_noise = FALSE, min_scale = min_width)$intervals[,1:2]
+
+      out[,1] <- evaluate_ints(diff1_mad, blocks_cpt)
+      out[,2] <- evaluate_ints(diff2_sd, blocks_cpt)
+      out[,3] <- evaluate_ints(diff2_tavc, blocks_cpt)
+
+      nsp_ <- nsp_poly(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
+      nsp_sn <- nsp_poly_selfnorm(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
+      nsp_ar <- nsp_poly_ar(xx, deg = blocks_deg, alpha = alpha)$intervals[,1:2]
+
+      out[,4] <- evaluate_ints(nsp_, blocks_cpt)
+      out[,5] <- evaluate_ints(nsp_sn, blocks_cpt)
+      out[,6] <- evaluate_ints(nsp_ar, blocks_cpt)
+
+      bp <- Bai_Perron_ints(xx, alpha = alpha, degree = blocks_deg, min_width = min_width)$intervals[,1:2]
+      out[,7] <- evaluate_ints(bp, blocks_cpt)
+
+      mosum_uni <- uniscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals[,1:2]
+      mosum_multi <- multiscale_mosum_ints(xx, alpha = alpha, min_width = min_width)$intervals[,1:2]
+
+      out[,8] <- evaluate_ints(mosum_uni, blocks_cpt)
+      out[,9] <- evaluate_ints(mosum_multi, blocks_cpt)
+
+      smuce <- smuce_ints(xx, alpha = alpha)$intervals[,1:2]
+      dep_smuce <- dep_smuce_ints(xx, alpha = alpha)$intervals[,1:2]
+      h_smuce <- h_smuce_ints(xx, alpha = alpha)$intervals[,1:2]
+
+      out[,10] <- evaluate_ints(smuce, blocks_cpt)
+      out[,11] <- evaluate_ints(dep_smuce, blocks_cpt)
+      out[,12] <- evaluate_ints(h_smuce, blocks_cpt)
+
+      out
+
+    } -> out
+
+  blocks_out<- cbind(blocks_out, unpack(out))
+}
+
+
+## Save outputs
+##
+
+blocks_out <- data.frame(blocks_out)
+
+save(blocks_out, file = "RData/blocks-performance")
+
+blocks_out <- cbind(
+  special_pad(methods_names,1,2),
+  rep(metrics_names, 12),
+  blocks_out
+)
+
+colnames(blocks_out) <- c(rep("",2),names(noise_types))
+
+print(
+  xtable(blocks_out, align = "|l|c|c|c|c|c|c|"),
+  file = "tables/blocks-performance.tex",
+  floating = FALSE,
+  include.rownames = FALSE
+)
+
 
 
 #---------------------
@@ -413,6 +413,7 @@ print(
 )
 
 
-
 stopCluster(cl)
+
+rm(cl)
 

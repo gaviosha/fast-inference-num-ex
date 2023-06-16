@@ -29,7 +29,7 @@ min_width <- floor(sqrt(nn)) # minimum segment length
 polynomial_degrees <- 0:2
 
 noise_types <- list(
-  # N1 = function(nn, sd) rnorm(nn, sd = sd),
+  N1 = function(nn, sd) rnorm(nn, sd = sd),
   N2 = function(nn, sd) sd * sqrt(3/5) * rt(nn, df = 5),
   N3 = function(nn, sd) arima.sim(model = list(ar = 0.5), n = nn, sd = sd / sqrt(1-0.5**2)),
   N4 = function(nn, sd) arima.sim(model = list(ar = 0.5), n = nn, rand.gen = function(n) sd * sqrt(3/5) * rt(n, df = 5))
@@ -95,7 +95,7 @@ for (ii in seq_along(noise_types))
   
   N_coverage <- data.frame(N_coverage)
   
-  save(N_coverage, file = paste("RData/", names(noise_types)[ii], "-coverage", sep = ""))
+  save(N_coverage, file = paste("../RData/", names(noise_types)[ii], "-coverage", sep = ""))
   
   
   rownames(N_coverage) <- methods_names
@@ -106,7 +106,7 @@ for (ii in seq_along(noise_types))
   
   print(
     xtable(N_coverage, align = "|l|c|c|c|"),
-    file = paste("tables/", names(noise_types)[ii], "-coverage.tex", sep = ""),
+    file = paste("../tables/", names(noise_types)[ii], "-coverage.tex", sep = ""),
     floating = FALSE
   )
   

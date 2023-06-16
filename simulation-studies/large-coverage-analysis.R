@@ -117,7 +117,7 @@ for (ii in seq_along(noise_types))
   
   ## save 
   
-  save(out, file = paste("RData/", names(noise_types)[ii], "-large-coverage-1", sep = ""))
+  save(out, file = paste("../RData/", names(noise_types)[ii], "-large-coverage-1", sep = ""))
   
   ## post-process
   
@@ -135,7 +135,7 @@ for (ii in seq_along(noise_types))
   
   print(
     xtable(out, align = "|l|l|l|c|c|c|"), 
-    file = paste("tables/", names(noise_types)[ii], "-large-coverage-1.tex", sep = ""),
+    file = paste("../tables/", names(noise_types)[ii], "-large-coverage-1.tex", sep = ""),
     include.rownames = FALSE, 
     floating = FALSE
   )
