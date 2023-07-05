@@ -24,7 +24,7 @@ KK <- 500 # number of replications
 
 alpha <- 0.1 # desired coverage
 
-min_width <- floor(sqrt(nn)) # minimum segment length
+min_width <- floor(sqrt(nn)/2) # minimum segment length
 
 polynomial_degrees <- 0:2
 

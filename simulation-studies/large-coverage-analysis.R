@@ -11,7 +11,7 @@ library(foreach)
 library(xtable)
 
 
-methods_names <- c("DIF1-MAD", "DIF2-SD", "DIF2-TAVC")
+methods_names <- c("DIF1-MAD", "DIF2-SD", "DIF2-LRV")
 
 ## Simulation parameters
 ##
@@ -105,9 +105,9 @@ for (ii in seq_along(noise_types))
           
           xx <- noise_types[[ii]](sample_sizes[jj],1)
           c(
-            nrow(diffInf(xx, degree = polynomial_degrees[kk], alpha = alpha, gaussian_noise = TRUE, independent_noise = TRUE, min_scale = sample_sizes[jj]^{(1/3)})$intervals) == 0, 
-            nrow(diffInf(xx, degree = polynomial_degrees[kk], alpha = alpha, gaussian_noise = FALSE, independent_noise = TRUE, min_scale = sample_sizes[jj]^{(1/3)})$intervals) == 0, 
-            nrow(diffInf(xx, degree = polynomial_degrees[kk], alpha = alpha, gaussian_noise = FALSE, independent_noise = FALSE, min_scale = sample_sizes[jj]^{(1/3)})$intervals) == 0
+            nrow(diffInf(xx, degree = polynomial_degrees[kk], alpha = alpha, gaussian_noise = TRUE, independent_noise = TRUE, min_scale = sample_sizes[jj]^{(1/2)}/2)$intervals) == 0, 
+            nrow(diffInf(xx, degree = polynomial_degrees[kk], alpha = alpha, gaussian_noise = FALSE, independent_noise = TRUE, min_scale = sample_sizes[jj]^{(1/2)}/2)$intervals) == 0, 
+            nrow(diffInf(xx, degree = polynomial_degrees[kk], alpha = alpha, gaussian_noise = FALSE, independent_noise = FALSE, min_scale = sample_sizes[jj]^{(1/2)}/2)$intervals) == 0
           )
         }
       
@@ -117,7 +117,7 @@ for (ii in seq_along(noise_types))
   
   ## save 
   
-  save(out, file = paste("../RData/", names(noise_types)[ii], "-large-coverage-1", sep = ""))
+  save(out, file = paste("../RData/", names(noise_types)[ii], "-large-coverage", sep = ""))
   
   ## post-process
   
@@ -135,7 +135,7 @@ for (ii in seq_along(noise_types))
   
   print(
     xtable(out, align = "|l|l|l|c|c|c|"), 
-    file = paste("../tables/", names(noise_types)[ii], "-large-coverage-1.tex", sep = ""),
+    file = paste("../tables/", names(noise_types)[ii], "-large-coverage.tex", sep = ""),
     include.rownames = FALSE, 
     floating = FALSE
   )

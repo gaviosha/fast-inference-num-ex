@@ -138,7 +138,7 @@ blocks_cpt <- c(205, 267, 308, 472)
 
 nn <- length(blocks_signal)
 
-min_width <- floor(sqrt(nn))
+min_width <- floor(sqrt(nn)/2)
 
 blocks_deg <- 0
 
@@ -210,7 +210,7 @@ for (ii in seq_along(noise_types))
 
 blocks_out <- data.frame(blocks_out)
 
-save(blocks_out, file = "RData/blocks-performance")
+save(blocks_out, file = "../RData/blocks-performance")
 
 blocks_out <- cbind(
   special_pad(methods_names,1,2),
@@ -222,7 +222,7 @@ colnames(blocks_out) <- c(rep("",2),names(noise_types))
 
 print(
   xtable(blocks_out, align = "|l|c|c|c|c|c|c|"),
-  file = "tables/blocks-performance.tex",
+  file = "../tables/blocks-performance.tex",
   floating = FALSE,
   include.rownames = FALSE
 )
@@ -248,7 +248,7 @@ waves_cpt <- c(150,300,450)
 
 nn <- length(waves_signal)
 
-min_width <- floor(sqrt(nn))
+min_width <- floor(sqrt(nn)/2)
 
 waves_deg <- 1
 
@@ -303,7 +303,7 @@ for (ii in seq_along(noise_types))
 
 waves_out <- data.frame(waves_out)
 
-save(waves_out, file = "RData/waves-performance")
+save(waves_out, file = "../RData/waves-performance")
 
 waves_out <- cbind(
   special_pad(methods_names[1:6],1,2), 
@@ -315,7 +315,7 @@ colnames(waves_out) <- c(rep("",2),names(noise_types))
 
 print(
   xtable(waves_out, align = "|l|c|c|c|c|c|c|"),
-  file = "tables/waves-performance.tex",
+  file = "../tables/waves-performance.tex",
   floating = FALSE, 
   include.rownames = FALSE
 )
@@ -340,7 +340,7 @@ hills_cpt <- c(100,200,300)
 
 nn <- length(hills_signal)
 
-min_width <- floor(sqrt(nn))
+min_width <- floor(sqrt(nn)/2)
 
 hills_deg <- 2
 
@@ -395,7 +395,7 @@ for (ii in seq_along(noise_types))
 
 hills_out <- data.frame(hills_out)
 
-save(hills_out, file = "RData/hills-performance")
+save(hills_out, file = "../RData/hills-performance")
 
 hills_out <- cbind(
   special_pad(methods_names[1:6],1,2), 
@@ -407,7 +407,7 @@ colnames(hills_out) <- c(rep("",2),names(noise_types))
 
 print(
   xtable(hills_out, align = "|l|c|c|c|c|c|c|"),
-  file = "tables/hills-performance.tex",
+  file = "../tables/hills-performance.tex",
   floating = FALSE, 
   include.rownames = FALSE
 )
