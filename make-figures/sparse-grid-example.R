@@ -2,9 +2,9 @@
 ## params
 ##
 
-nn <- 13
+nn <- 20
 
-aa <- sqrt(2)
+aa <- 2
 
 eps <- 0.02
 

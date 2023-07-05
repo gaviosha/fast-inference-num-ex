@@ -188,6 +188,3 @@ y <- x[1007:2478]
 p <- estimateParameters(y, model = "AR")
 
 DeCAFS(y, modelParam = p, beta = 2 * log(length(x)))$changepoints
-
-wcm.gsa(y)$cp
-
