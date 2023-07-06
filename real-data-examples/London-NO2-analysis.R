@@ -173,12 +173,6 @@ dev.off()
 #
 #---------------------------------------
 
-## WCM.gSa identifies only one cpt in third interval
-## 
-
-y <- x[6083:6806]
-
-wcm.gsa(y)$cp
 
 ## WCM.gSa and DeCAFS find no cpts between first and second interval
 ##
