@@ -14,7 +14,7 @@ Code for reproducing simulation studies and real data examples in the paper "Fas
 The packages in the table below are required to reproduce the results in the paper. Some of the packages are no longer on CRAN, but can still be installed using from their GitHub mirrors using `devtools::install_github`.
 
 Package | CRAN | Mirror |
-|---|---|
+|---|---|---|
 | ChangePointInference | ✘ | [link](https://github.com/gaviosha/ChangePointInference) | 
 | not | ✓ | |
 | IDetect | ✓| | 
