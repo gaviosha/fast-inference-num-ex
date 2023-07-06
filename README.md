@@ -24,7 +24,7 @@ Package | CRAN | Mirror |
 | AR1seg | ✘ | [link](https://github.com/cran/AR1seg) |
 | nsp | ✓| |
 | lpSolve | ✓| |
-| stepR | | ✘ | [link](https://github.com/cran/stepR) |
+| stepR | ✘ | [link](https://github.com/cran/stepR) |
 | stats | ✓| |
 | doParallel | ✓| |
 | foreach | ✓| |
